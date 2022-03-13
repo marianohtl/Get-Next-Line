@@ -71,3 +71,34 @@ size_t	ft_strlen(const char *s)
 		length++;
 	return (length);
 }
+
+char	*ft_strchr(const char *string, int c)
+{
+	unsigned int	index;
+	char			convert_c;
+
+	convert_c = (char) c;
+	index = 0;
+	while (string[index] != '\0')
+	{
+		if (string[index] == convert_c)
+			return ((char *) &string[index]);
+		index++;
+	}
+	if (string[index] == convert_c)
+		return ((char *) &string[index]);
+	return (NULL);
+}
+
+void	*ft_memset(void *s, int c, size_t n)
+{
+	size_t	index;
+
+	index = 0;
+	while (index < n)
+	{
+		((unsigned char *)s)[index] = c;
+		index++;
+	}
+	return (s);
+}

@@ -11,7 +11,6 @@ char *get_next_line(int fd)
 	static int read_bytes;
 	char *butter_last;
 	char butter_other[BUFFER_SIZE + 1];
-	size_t menino;
 	butter_last = "";
 
 	if(read_bytes == 0)
@@ -20,12 +19,13 @@ char *get_next_line(int fd)
 		if(read_bytes == 0)
 			return(NULL);
 	}
-	while (butter[i] != '\n' )
+	while (butter[i] != '\n')
 	{
-		if (i == 15)
+		if (i == read_bytes - 1)
 		{
-			ft_strlcpy(butter_other, &butter[start_index], BUFFER_SIZE + 1 - start_index);
+			ft_strlcpy(butter_other, &butter[start_index], read_bytes + 1 - start_index);
 			butter_last = ft_strjoin(butter_last, butter_other);
+			ft_memset(butter, 0, BUFFER_SIZE);
 			read_bytes = read(fd, butter, BUFFER_SIZE);
 			start_index = 0;
 			i = 0;
@@ -40,6 +40,12 @@ char *get_next_line(int fd)
 	ft_strlcpy(butter_other, &butter[start_index], i - start_index + 2);
 	butter_last = ft_strjoin(butter_last, butter_other);
 	i++;
+	if(i >= BUFFER_SIZE)
+	{
+		i = 0;
+		ft_memset(butter, 0, BUFFER_SIZE);
+		read_bytes = read(fd, butter, BUFFER_SIZE);
+	}
 	start_index = i;
 	return butter_last;
 }
@@ -47,8 +53,8 @@ int main()
 {
 	int fd;
 	char *result;
-	fd = open("test.md", O_RDONLY);
-	//fd = 1;
+	// fd = open("test.md", O_RDONLY);
+	fd = 1;
 
 	result = "";
 
