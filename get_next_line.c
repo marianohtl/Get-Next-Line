@@ -1,18 +1,17 @@
 #include <fcntl.h>
-#include <unistd.h>
 #include <stdio.h>
-#include "libft.h"
+#include "get_next_line.h"
+
 
 char *get_next_line(int fd)
 {
 	static char butter[16];
+	static int start_index;
+	static int i;
+	static int read_bytes = 1;
 	char *butter_last;
 	char butter_other[17];
 	size_t menino;
-	static int i;
-	static int start_index;
-	static int read_bytes = 1;
-
 	butter_last = "";
 
 	while (butter[i] != '\n' )
@@ -20,7 +19,7 @@ char *get_next_line(int fd)
 		if (i == 15)
 		{
 			ft_strlcpy(butter_other, &butter[start_index], 17 - start_index);
-			butter_last = ft_strjoin(butter_last, butter_other);
+		butter_last = ft_strjoin(butter_last, butter_other);
 			read_bytes = read(fd, butter, 16);
 			start_index = 0;
 			i = 0;
@@ -35,46 +34,25 @@ char *get_next_line(int fd)
 	i++;
 	start_index = i;
 	if(read_bytes == 0)
-		return(ft_strdup(""));
+		return(NULL);
 	return butter_last;
 }
 int main()
 {
-	int fd = open("test.md", O_RDONLY);
+	int fd;
 	char *result;
+	// fd = open("test.md", O_RDONLY);
+	fd = 1;
 
-	result = get_next_line(fd);
-	dprintf(1, "fora da funcao %s \n", result);
+	result = "";
 
-	result = get_next_line(fd);
-	dprintf(1, "fora da funcao %s \n", result);
+	while(result != NULL)
+	{
+		result = get_next_line(fd);
+		printf("################ inicio\n");
+		printf("%s", result);
+		printf("\n################ fim\n");
 
-	result = get_next_line(fd);
-	dprintf(1, "fora da funcao %s \n", result);
-
-	result = get_next_line(fd);
-	dprintf(1, "fora da funcao %s \n", result);
-
-	result = get_next_line(fd);
-	dprintf(1, "fora da funcao %s \n", result);
-
-	result = get_next_line(fd);
-	dprintf(1, "fora da funcao %s \n", result);
-
-	result = get_next_line(fd);
-	dprintf(1, "fora da funcao %s \n", result);
-
-	result = get_next_line(fd);
-	dprintf(1, "fora da funcao %s \n", result);
-
-	result = get_next_line(fd);
-	dprintf(1, "fora da funcao %s \n", result);
-
-	result = get_next_line(fd);
-	dprintf(1, "fora da funcao %s \n", result);
-
-	result = get_next_line(fd);
-	dprintf(1, "fora da funcao %s \n", result);
-
+	}
 	return 0;
 }
