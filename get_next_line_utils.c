@@ -47,7 +47,7 @@ size_t	ft_strlcpy(char *dest, const char *src, size_t size)
 	return (src_length);
 }
 
-char	*ft_strjoin(char const *s1, char const *s2)
+char	*ft_strjoin(char *s1, char *s2)
 {
 	char	*concat;
 	int		all_size;
@@ -59,6 +59,7 @@ char	*ft_strjoin(char const *s1, char const *s2)
 		return (concat);
 	ft_strlcpy(concat, s1, all_size + 1);
 	ft_strlcat(concat, s2, all_size + 1);
+	free(s1);
 	return (concat);
 }
 
@@ -101,4 +102,17 @@ void	*ft_memset(void *s, int c, size_t n)
 		index++;
 	}
 	return (s);
+}
+
+char	*ft_strdup(const char *s)
+{
+	char	*result;
+	size_t	size;
+
+	size = ft_strlen(s) + 1;
+	result = malloc(size * sizeof(*result));
+	if (result == NULL)
+		return (result);
+	ft_strlcpy(result, s, size);
+	return (result);
 }
