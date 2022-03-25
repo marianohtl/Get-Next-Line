@@ -59,7 +59,6 @@ char	*ft_strjoin(char *s1, char *s2)
 		return (concat);
 	ft_strlcpy(concat, s1, all_size + 1);
 	ft_strlcat(concat, s2, all_size + 1);
-	free(s1);
 	return (concat);
 }
 
@@ -94,11 +93,13 @@ char	*ft_strchr(const char *string, int c)
 void	*ft_memset(void *s, int c, size_t n)
 {
 	size_t	index;
+	unsigned char * str;
+	str = s;
 
 	index = 0;
 	while (index < n)
 	{
-		((unsigned char *)s)[index] = c;
+		str[index] = c;
 		index++;
 	}
 	return (s);
