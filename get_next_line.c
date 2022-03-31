@@ -6,7 +6,7 @@
 /*   By: tmariano <tmariano@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/27 21:11:15 by tmariano          #+#    #+#             */
-/*   Updated: 2022/03/30 22:46:54 by tmariano         ###   ########.fr       */
+/*   Updated: 2022/03/30 23:24:24 by tmariano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,12 +32,27 @@ static ssize_t	ft_strchri(const char *string, int c)
 	return (-1);
 }
 
-static void cleaning(char **old_adress, char *new_adress)
+static void	cleaning(char **old_adress, char *new_adress)
 {
-	char *clean;
+	char	*clean;
+
 	clean = *old_adress;
 	*old_adress = new_adress;
 	free(clean);
+}
+
+static char	*tatakae(int fd, char *buffer)
+{
+	if ((fd < 0) || (BUFFER_SIZE < 1) || (read(fd, buffer, 0) < 0))
+		return (NULL);
+	if (!buffer)
+	{
+		buffer = malloc((BUFFER_SIZE + 1) * sizeof(*buffer));
+		if (!buffer)
+			return (NULL);
+		buffer[0] = '\0';
+	}
+	return (buffer);
 }
 
 char	*get_next_line(int fd)
@@ -48,21 +63,16 @@ char	*get_next_line(int fd)
 	int			has_new_line;
 	size_t		buffer_size;
 
-	if ((fd < 0) || (BUFFER_SIZE < 1) || (read(fd, buffer, 0) < 0))
-		return (NULL);
+	buffer = tatakae(fd, buffer);
 	if (!buffer)
-	{
-		buffer = malloc((BUFFER_SIZE + 1) * sizeof(*buffer));
-		if (!buffer)
-			return (NULL);
-		buffer[0] = '\0';
-	}
+		return (NULL);
 	read_bytes = BUFFER_SIZE;
-	has_new_line = -1;
-	next_line = ft_strdup("");
+	// next_line = ft_strdup("");
+	next_line = malloc(sizeof(*next_line));
 	if (!next_line)
 		return (NULL);
-	while (has_new_line == -1 && read_bytes >= BUFFER_SIZE)
+	next_line[0] = '\0';
+	while (read_bytes >= BUFFER_SIZE)
 	{
 		buffer_size = ft_strlen(buffer);
 		if (buffer_size == 0)
@@ -70,14 +80,16 @@ char	*get_next_line(int fd)
 		has_new_line = ft_strchri(buffer, '\n');
 		if (has_new_line != -1)
 		{
-
-			cleaning(&next_line, ft_strjoin(next_line, buffer, ft_strlen(next_line) + has_new_line + 2));
+			cleaning(&next_line, ft_strjoin(next_line, buffer,
+					ft_strlen(next_line) + has_new_line + 2));
 			if (!next_line)
 				return (NULL);
-			ft_strlcpy(buffer, &buffer[has_new_line + 1], read_bytes - (size_t)has_new_line);
+			ft_strlcpy(buffer, &buffer[has_new_line + 1],
+				read_bytes - (size_t)has_new_line);
 			return (next_line);
 		}
-		cleaning(&next_line, ft_strjoin(next_line, buffer, ft_strlen(next_line) + read_bytes + 1));
+		cleaning(&next_line, ft_strjoin(next_line, buffer,
+				ft_strlen(next_line) + read_bytes + 1));
 		if (!next_line)
 			return (NULL);
 		buffer[0] = '\0';
