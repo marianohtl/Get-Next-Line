@@ -1,81 +1,105 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: tmariano <tmariano@student.42sp.org.br>    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/03/27 21:11:15 by tmariano          #+#    #+#             */
+/*   Updated: 2022/03/30 22:46:54 by tmariano         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include <fcntl.h>
 #include <stdio.h>
 #include "get_next_line.h"
 
-
-char *get_next_line(int fd)
+static ssize_t	ft_strchri(const char *string, int c)
 {
-	static char *butter;
-	static int start_index;
-	static int i;
-	static ssize_t read_bytes;
-	char *butter_last;
-	char *butter_other;
-	char *nana;
+	ssize_t	index;
+	char	convert_c;
 
-	butter_last = ft_strdup("");
-	butter_other = malloc((BUFFER_SIZE + 1) * sizeof(*butter_other));
-	butter_other[0] = '\0';
-	if(!butter_other)
+	convert_c = (char) c;
+	index = 0;
+	while (string[index] != '\0')
 	{
-		printf("porra malloc");
-		return butter_other;
+		if (string[index] == convert_c)
+			return (index);
+		index++;
 	}
-	if(!butter)
-	{
-		butter = malloc(BUFFER_SIZE * sizeof(*butter));
-		if(!butter)
-		{
-			printf("porra malloc");
-			return butter;
-		}
-	}
-
-	if(read_bytes == 0)
-	{
-		read_bytes = read(fd, butter, BUFFER_SIZE);
-		if(read_bytes == 0)
-			return(NULL);
-	}
-	while (butter[i] != '\n')
-	{
-		if (i > read_bytes - 1)
-		{
-			ft_strlcpy(butter_other, &butter[start_index], read_bytes + 1 - start_index);
-			if(!butter_other)
-				return butter_other;
-			nana = butter_last;
-			butter_last = ft_strjoin(butter_last, butter_other);
-			free(nana);
-			if(!butter_last)
-				return butter_last;
-			//ft_memset(butter, 0, BUFFER_SIZE);
-			read_bytes = read(fd, butter, BUFFER_SIZE);
-			if(read_bytes < BUFFER_SIZE)
-				butter[read_bytes] = 0;
-			start_index = 0;
-			i = 0;
-			if(read_bytes == 0)
-				break;
-		}
-		else
-		{
-			i++;
-		}
-	}
-	ft_strlcpy(butter_other, &butter[start_index], i - start_index + 2);
-	if(!butter_other){
-		free(butter_last);
-		return butter_other;
-	}
-	nana = butter_last;
-	butter_last = ft_strjoin(butter_last, butter_other);
-	free(nana);
-	free(butter_other);
-	if(!butter_last)
-		return butter_last;
-	i++;
-
-	start_index = i;
-	return butter_last;
+	if (string[index] == convert_c)
+		return (index);
+	return (-1);
 }
+
+static void cleaning(char **old_adress, char *new_adress)
+{
+	char *clean;
+	clean = *old_adress;
+	*old_adress = new_adress;
+	free(clean);
+}
+
+char	*get_next_line(int fd)
+{
+	static char	*buffer;
+	char		*next_line;
+	size_t		read_bytes;
+	int			has_new_line;
+	size_t		buffer_size;
+
+	if ((fd < 0) || (BUFFER_SIZE < 1) || (read(fd, buffer, 0) < 0))
+		return (NULL);
+	if (!buffer)
+	{
+		buffer = malloc((BUFFER_SIZE + 1) * sizeof(*buffer));
+		if (!buffer)
+			return (NULL);
+		buffer[0] = '\0';
+	}
+	read_bytes = BUFFER_SIZE;
+	has_new_line = -1;
+	next_line = ft_strdup("");
+	if (!next_line)
+		return (NULL);
+	while (has_new_line == -1 && read_bytes >= BUFFER_SIZE)
+	{
+		buffer_size = ft_strlen(buffer);
+		if (buffer_size == 0)
+			read_bytes = read(fd, buffer, BUFFER_SIZE);
+		has_new_line = ft_strchri(buffer, '\n');
+		if (has_new_line != -1)
+		{
+
+			cleaning(&next_line, ft_strjoin(next_line, buffer, ft_strlen(next_line) + has_new_line + 2));
+			if (!next_line)
+				return (NULL);
+			ft_strlcpy(buffer, &buffer[has_new_line + 1], read_bytes - (size_t)has_new_line);
+			return (next_line);
+		}
+		cleaning(&next_line, ft_strjoin(next_line, buffer, ft_strlen(next_line) + read_bytes + 1));
+		if (!next_line)
+			return (NULL);
+		buffer[0] = '\0';
+	}
+	cleaning(&buffer, NULL);
+	if (*next_line == '\0')
+	{
+		free(next_line);
+		return (NULL);
+	}
+	return (next_line);
+}
+
+// int main()
+// {
+// 	int fd = open("test.md", O_RDONLY);
+
+// 	char *result;
+
+// 	while(result != NULL)
+// 	{
+// 		result = get_next_line(fd);
+// 	}
+// 	return 0;
+// }

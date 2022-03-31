@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   get_next_line_utils.c                              :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: tmariano <tmariano@student.42sp.org.br>    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/03/27 21:11:15 by tmariano          #+#    #+#             */
+/*   Updated: 2022/03/30 22:10:02 by tmariano         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "get_next_line.h"
 
 size_t	ft_strlcat(char *dest, const char *src, size_t size)
@@ -12,7 +24,6 @@ size_t	ft_strlcat(char *dest, const char *src, size_t size)
 	ft_strlcpy(&dest[size_dest], src, size - size_dest);
 	return (size_dest + size_src);
 }
-
 void	*ft_memcpy(void *dest, const void *src, size_t n)
 {
 	size_t				index;
@@ -47,18 +58,15 @@ size_t	ft_strlcpy(char *dest, const char *src, size_t size)
 	return (src_length);
 }
 
-char	*ft_strjoin(char *s1, char *s2)
+char	*ft_strjoin(char *s1, char *s2, size_t n)
 {
 	char	*concat;
-	int		all_size;
 
-	all_size = ft_strlen(s1);
-	all_size += ft_strlen(s2);
-	concat = malloc((all_size + 1) * sizeof(*concat));
+	concat = malloc(n * sizeof(*concat));
 	if (concat == NULL)
 		return (concat);
-	ft_strlcpy(concat, s1, all_size + 1);
-	ft_strlcat(concat, s2, all_size + 1);
+	ft_strlcpy(concat, s1, n);
+	ft_strlcat(concat, s2, n);
 	return (concat);
 }
 
@@ -70,39 +78,6 @@ size_t	ft_strlen(const char *s)
 	while (s[length] != 0)
 		length++;
 	return (length);
-}
-
-char	*ft_strchr(const char *string, int c)
-{
-	unsigned int	index;
-	char			convert_c;
-
-	convert_c = (char) c;
-	index = 0;
-	while (string[index] != '\0')
-	{
-		if (string[index] == convert_c)
-			return ((char *) &string[index]);
-		index++;
-	}
-	if (string[index] == convert_c)
-		return ((char *) &string[index]);
-	return (NULL);
-}
-
-void	*ft_memset(void *s, int c, size_t n)
-{
-	size_t	index;
-	unsigned char * str;
-	str = s;
-
-	index = 0;
-	while (index < n)
-	{
-		str[index] = c;
-		index++;
-	}
-	return (s);
 }
 
 char	*ft_strdup(const char *s)
