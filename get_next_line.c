@@ -6,17 +6,13 @@
 /*   By: tmariano <tmariano@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/27 21:11:15 by tmariano          #+#    #+#             */
-/*   Updated: 2022/04/01 00:51:38 by tmariano         ###   ########.fr       */
+/*   Updated: 2022/04/05 00:07:23 by tmariano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <fcntl.h>
-#include <stdio.h>
+//#include <stdio.h>
 #include "get_next_line.h"
-
-#ifndef BUFFER_SIZE
-# define BUFFER_SIZE -1
-#endif
 
 static ssize_t	ft_strchri(const char *string, int c)
 {
@@ -36,7 +32,7 @@ static ssize_t	ft_strchri(const char *string, int c)
 	return (-1);
 }
 
-static char	*cleaning(char **old_adress, char *new_adress)
+static char	*clean_set(char **old_adress, char *new_adress)
 {
 	char	*clean;
 
@@ -46,7 +42,7 @@ static char	*cleaning(char **old_adress, char *new_adress)
 	return (*old_adress);
 }
 
-static char	*tatakae(int fd, char *buffer)
+static char	*initialize_buffer(int fd, char *buffer)
 {
 	size_t	i;
 
@@ -70,8 +66,10 @@ static char	*tatakae(int fd, char *buffer)
 static char	*new_line(char **buffer, char **next, int has_new_line,
 	int read_bytes)
 {
-	cleaning(next, join(*next, *buffer,
-			len(*next) + has_new_line + 2));
+	char	*concat;
+
+	concat = join(*next, *buffer, len(*next) + has_new_line + 2);
+	clean_set(next, concat);
 	if (!*next)
 		return (NULL);
 	ft_strlcpy(*buffer, &(*buffer)[has_new_line + 1],
@@ -84,16 +82,14 @@ char	*get_next_line(int fd)
 	static char	*buffer;
 	char		*next;
 	size_t		read_bytes;
+	size_t		i = 0;
 	int			has_new_line;
 
-	buffer = tatakae(fd, buffer);
+	buffer = initialize_buffer(fd, buffer);
 	if (!buffer)
 		return (NULL);
 	read_bytes = BUFFER_SIZE;
-	next = malloc(sizeof(*next));
-	if (!next)
-		return (NULL);
-	next[0] = '\0';
+	next = NULL;
 	while (read_bytes >= BUFFER_SIZE)
 	{
 		if (len(buffer) == 0)
@@ -101,25 +97,32 @@ char	*get_next_line(int fd)
 		has_new_line = ft_strchri(buffer, '\n');
 		if (has_new_line != -1)
 			return (new_line(&buffer, &next, has_new_line, read_bytes));
-		if (!(cleaning(&next, join(next, buffer, len(next) + read_bytes + 1))))
+		if (!(clean_set(&next, join(next, buffer, len(next) + read_bytes + 1))))
 			return (NULL);
-		buffer[0] = '\0';
+		while (i < BUFFER_SIZE + 1)
+			buffer[i++] = '\0';
+
+		i = 0;
 	}
-	cleaning(&buffer, NULL);
-	if (*next == '\0')
-		cleaning(&next, NULL);
+	clean_set(&buffer, NULL);
+	if (len(next) == 0)
+		clean_set(&next, NULL);
 	return (next);
 }
 
-// int main()
-// {
-// 	int fd = open("test.md", O_RDONLY);
 
-// 	char *result;
+int main(void)
+{
+	int fd = open("./test.md", O_RDONLY);
 
-// 	while(result != NULL)
-// 	{
-// 		result = get_next_line(fd);
-// 	}
-// 	return 0;
-// }
+	char *result;
+
+	result = "";
+	while(result != NULL)
+	{
+		result = get_next_line(fd);
+		printf(">%s<", result);
+		free(result);
+	}
+	return 0;
+}

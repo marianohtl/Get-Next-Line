@@ -6,7 +6,7 @@
 /*   By: tmariano <tmariano@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/27 21:11:15 by tmariano          #+#    #+#             */
-/*   Updated: 2022/04/01 00:40:35 by tmariano         ###   ########.fr       */
+/*   Updated: 2022/04/04 23:59:00 by tmariano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,8 @@ size_t	len(const char *s)
 {
 	size_t	length;
 
+	if (!s)
+		return (0);
 	length = 0;
 	while (s[length] != '\0')
 		length++;
@@ -27,7 +29,6 @@ size_t	ft_strlcpy(char *dest, const char *src, size_t size)
 	size_t		src_length;
 	size_t		copy_length;
 	size_t		index;
-	const char	*str_src;
 
 	src_length = len(src);
 	if (size != 0)
@@ -35,11 +36,10 @@ size_t	ft_strlcpy(char *dest, const char *src, size_t size)
 		copy_length = src_length;
 		if (size <= src_length)
 			copy_length = size - 1;
-		str_src = src;
 		index = 0;
 		while (index < copy_length)
 		{
-			dest[index] = str_src[index];
+			dest[index] = src[index];
 			index = index + 1;
 		}
 		dest[copy_length] = '\0';
@@ -63,10 +63,13 @@ size_t	ft_strlcat(char *dest, const char *src, size_t size)
 char	*join(char *s1, char *s2, size_t n)
 {
 	char	*concat;
+	size_t i = 0;
 
 	concat = malloc(n * sizeof(*concat));
 	if (concat == NULL)
 		return (concat);
+	while (i < n)
+		concat[i++] = '\0';
 	ft_strlcpy(concat, s1, n);
 	ft_strlcat(concat, s2, n);
 	return (concat);

@@ -6,7 +6,7 @@
 /*   By: tmariano <tmariano@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/27 21:11:15 by tmariano          #+#    #+#             */
-/*   Updated: 2022/04/01 00:40:34 by tmariano         ###   ########.fr       */
+/*   Updated: 2022/04/05 00:06:36 by tmariano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,10 @@
 # define GET_NEXT_LINE_H
 # include<stdlib.h>
 # include <unistd.h>
+
+#ifndef BUFFER_SIZE
+# define BUFFER_SIZE -1
+#endif
 
 char	*get_next_line(int fd);
 size_t	ft_strlcat(char *dest, const char *src, size_t size);
