@@ -6,12 +6,10 @@
 /*   By: tmariano <tmariano@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/27 21:11:15 by tmariano          #+#    #+#             */
-/*   Updated: 2022/04/05 00:07:23 by tmariano         ###   ########.fr       */
+/*   Updated: 2022/04/05 00:22:49 by tmariano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <fcntl.h>
-//#include <stdio.h>
 #include "get_next_line.h"
 
 static ssize_t	ft_strchri(const char *string, int c)
@@ -54,11 +52,7 @@ static char	*initialize_buffer(int fd, char *buffer)
 		buffer = malloc((BUFFER_SIZE + 1) * sizeof(*buffer));
 		if (!buffer)
 			return (NULL);
-		while (i <= BUFFER_SIZE)
-		{
-			buffer[i] = '\0';
-			i++;
-		}
+		ft_strset(buffer, BUFFER_SIZE + 1);
 	}
 	return (buffer);
 }
@@ -82,7 +76,6 @@ char	*get_next_line(int fd)
 	static char	*buffer;
 	char		*next;
 	size_t		read_bytes;
-	size_t		i = 0;
 	int			has_new_line;
 
 	buffer = initialize_buffer(fd, buffer);
@@ -99,30 +92,10 @@ char	*get_next_line(int fd)
 			return (new_line(&buffer, &next, has_new_line, read_bytes));
 		if (!(clean_set(&next, join(next, buffer, len(next) + read_bytes + 1))))
 			return (NULL);
-		while (i < BUFFER_SIZE + 1)
-			buffer[i++] = '\0';
-
-		i = 0;
+		ft_strset(buffer, BUFFER_SIZE + 1);
 	}
 	clean_set(&buffer, NULL);
 	if (len(next) == 0)
 		clean_set(&next, NULL);
 	return (next);
-}
-
-
-int main(void)
-{
-	int fd = open("./test.md", O_RDONLY);
-
-	char *result;
-
-	result = "";
-	while(result != NULL)
-	{
-		result = get_next_line(fd);
-		printf(">%s<", result);
-		free(result);
-	}
-	return 0;
 }
