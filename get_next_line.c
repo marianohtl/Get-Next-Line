@@ -6,11 +6,13 @@
 /*   By: tmariano <tmariano@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/27 21:11:15 by tmariano          #+#    #+#             */
-/*   Updated: 2022/04/05 00:22:49 by tmariano         ###   ########.fr       */
+/*   Updated: 2022/04/06 17:21:39 by tmariano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
+#include <fcntl.h>
+#include <stdio.h>
 
 static ssize_t	ft_strchri(const char *string, int c)
 {
@@ -42,9 +44,6 @@ static char	*clean_set(char **old_adress, char *new_adress)
 
 static char	*initialize_buffer(int fd, char *buffer)
 {
-	size_t	i;
-
-	i = 0;
 	if ((fd < 0) || (BUFFER_SIZE < 1) || (read(fd, buffer, 0) < 0))
 		return (NULL);
 	if (!buffer)

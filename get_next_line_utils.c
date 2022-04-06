@@ -6,7 +6,7 @@
 /*   By: tmariano <tmariano@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/27 21:11:15 by tmariano          #+#    #+#             */
-/*   Updated: 2022/04/05 00:24:03 by tmariano         ###   ########.fr       */
+/*   Updated: 2022/04/05 23:56:49 by tmariano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,9 +63,7 @@ size_t	ft_strlcat(char *dest, const char *src, size_t size)
 char	*join(char *s1, char *s2, size_t n)
 {
 	char	*concat;
-	size_t	i;
 
-	i = 0;
 	concat = malloc(n * sizeof(*concat));
 	if (concat == NULL)
 		return (concat);
@@ -79,6 +77,6 @@ void	ft_strset(char *str, size_t size)
 	size_t	i;
 
 	i = 0;
-	while (i <= size)
+	while (i < size)
 		str[i++] = '\0';
 }
