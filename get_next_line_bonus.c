@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tmariano <tmariano@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/27 21:11:15 by tmariano          #+#    #+#             */
-/*   Updated: 2022/04/08 12:01:16 by tmariano         ###   ########.fr       */
+/*   Updated: 2022/04/06 23:54:27 by tmariano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,59 +42,61 @@ static char	*clean_set(char **old_adress, char *new_adress)
 	return (*old_adress);
 }
 
-static char	*initialize_buffer(int fd, char *buffer)
+static void	initialize_buff(int fd, char **buff)
 {
-	if ((fd < 0) || (BUFFER_SIZE < 1) || (read(fd, buffer, 0) < 0))
-		return (NULL);
-	if (!buffer)
+	if ((fd < 0) || (BUFFER_SIZE < 1) || (read(fd, buff[fd], 0) < 0))
 	{
-		buffer = malloc((BUFFER_SIZE + 1) * sizeof(*buffer));
-		if (!buffer)
-			return (NULL);
-		ft_strset(buffer, BUFFER_SIZE + 1);
+		buff[fd] = NULL;
+		return ;
 	}
-	return (buffer);
+	if (!buff[fd])
+	{
+		buff[fd] = malloc((BUFFER_SIZE + 1) * sizeof(*buff[fd]));
+		if (!buff[fd])
+			return ;
+		ft_strset(buff[fd], BUFFER_SIZE + 1);
+	}
 }
 
-static char	*new_line(char **buffer, char **next, int has_new_line,
-	int read_bytes)
+static char	*new_line(char **buff, char **next, int has_new_line,
+	int rd_bytes)
 {
 	char	*concat;
 
-	concat = join(*next, *buffer, len(*next) + has_new_line + 2);
+	concat = join(*next, *buff, len(*next) + has_new_line + 2);
 	clean_set(next, concat);
 	if (!*next)
 		return (NULL);
-	ft_strlcpy(*buffer, &(*buffer)[has_new_line + 1],
-		read_bytes - (size_t)has_new_line); //buffer sem next
-	ft_strset(&(*buffer)[read_bytes - (size_t)has_new_line], has_new_line + 1); //limpa o que sobrou
+	ft_strlcpy(*buff, &(*buff)[has_new_line + 1],
+		rd_bytes - (size_t)has_new_line);
+	ft_strset(&(*buff)[rd_bytes - (size_t)has_new_line], has_new_line + 1);
 	return (*next);
 }
 
 char	*get_next_line(int fd)
 {
-	static char	*buffer;
+	static char	*buff[5000];
 	char		*next;
-	size_t		read_bytes;
+	size_t		rd_bytes;
 	int			has_new_line;
 
-	buffer = initialize_buffer(fd, buffer);
-	if (fd < 0 || !buffer)
+	initialize_buff(fd, buff);
+	if (fd < 0 || !buff[fd])
 		return (NULL);
-	read_bytes = BUFFER_SIZE;
+	rd_bytes = BUFFER_SIZE;
 	next = NULL;
-	while (read_bytes >= BUFFER_SIZE)
+	while (rd_bytes >= BUFFER_SIZE)
 	{
-		if (len(buffer) == 0)
-			read_bytes = read(fd, buffer, BUFFER_SIZE);
-		has_new_line = ft_strchri(buffer, '\n');
+		if (len(buff[fd]) == 0)
+			rd_bytes = read(fd, buff[fd], BUFFER_SIZE);
+		has_new_line = ft_strchri(buff[fd], '\n');
 		if (has_new_line != -1)
-			return (new_line(&buffer, &next, has_new_line, read_bytes));
-		if (!(clean_set(&next, join(next, buffer, len(next) + read_bytes + 1))))
+			return (new_line(&buff[fd], &next, has_new_line, rd_bytes));
+		if (!(clean_set(&next, join(next, buff[fd], len(next) + rd_bytes + 1))))
 			return (NULL);
-		ft_strset(buffer, BUFFER_SIZE + 1);
+		ft_strset(buff[fd], BUFFER_SIZE + 1);
 	}
-	clean_set(&buffer, NULL);
+	clean_set(&buff[fd], NULL);
 	if (len(next) == 0)
 		clean_set(&next, NULL);
 	return (next);
